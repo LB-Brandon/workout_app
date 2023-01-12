@@ -46,18 +46,31 @@ class ExerciseActivity : AppCompatActivity() {
     }
 
     private fun setupExerciseView(){
-//        binding?.flProgressBar?.visibility = View.GONE
-        binding?.flProgressBar?.visibility = View.INVISIBLE
-        binding?.tvTitle?.text = "Exercise"
+        binding?.tvTitle?.visibility = View.INVISIBLE
+        binding?.flRestView?.visibility = View.INVISIBLE
+
+        binding?.ivImage?.visibility = View.VISIBLE
+        binding?.tvExerciseName?.visibility = View.VISIBLE
         binding?.flExerciseView?.visibility = View.VISIBLE
+
         if(exerciseTimer != null){
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
+        // 이미지에 ExerciseModel 의 List 연결
+        binding?.ivImage?.setImageResource(exerciseList!![currentExercisePosition].getImage())
+        binding?.tvExerciseName?.text = exerciseList!![currentExercisePosition].getName()
         setExerciseProgressBar()
     }
 
     private fun setUpRestView(){
+        binding?.tvTitle?.visibility = View.VISIBLE
+        binding?.flRestView?.visibility = View.VISIBLE
+
+        binding?.ivImage?.visibility = View.INVISIBLE
+        binding?.tvExerciseName?.visibility = View.INVISIBLE
+        binding?.flExerciseView?.visibility = View.INVISIBLE
+
         if(restTimer != null){
             restTimer?.cancel()
             restProgress = 0
@@ -70,7 +83,6 @@ class ExerciseActivity : AppCompatActivity() {
         restTimer = object : CountDownTimer(10000, 1000){
 
             override fun onTick(millisUntilFinished: Long) {
-                Log.e("song", "rest")
                 restProgress++
                 binding?.progressBar?.progress = 10 - restProgress
                 binding?.tvTimer?.text = (10 - restProgress).toString()
@@ -90,14 +102,18 @@ class ExerciseActivity : AppCompatActivity() {
         exerciseTimer = object : CountDownTimer(30000, 1000){
 
             override fun onTick(millisUntilFinished: Long) {
-                Log.e("song", "exercise")
                 exerciseProgress++
                 binding?.progressBarExercise?.progress = 30 - exerciseProgress
                 binding?.tvTimerExercise?.text = (30 - exerciseProgress).toString()
             }
 
             override fun onFinish() {
-                Toast.makeText(this@ExerciseActivity, "30 Seconds are over, lets go to the rest view", Toast.LENGTH_LONG).show()
+                if(currentExercisePosition < exerciseList?.size!! - 1){
+                    setUpRestView()
+                    Toast.makeText(this@ExerciseActivity, "30 Seconds are over, lets go to the rest view", Toast.LENGTH_LONG).show()
+                }else{
+                    Toast.makeText(this@ExerciseActivity, "Congratulations!", Toast.LENGTH_LONG).show()
+                }
             }
 
         }.start()
